@@ -1,14 +1,14 @@
 use color_space::Lab;
 
 #[derive(Debug)]
-pub struct BaseColor<'a> {
-    pub name: &'a str,
+pub struct BaseColor {
+    pub name: &'static str,
     pub lab: Lab,
 }
 
-impl<'a> BaseColor<'a> {
+impl BaseColor {
     #[inline]
-    pub const fn new(name: &'a str, l: i32, a: i32, b: i32) -> BaseColor {
+    pub const fn new(name: &'static str, l: i32, a: i32, b: i32) -> BaseColor {
         BaseColor {
             name,
             lab: Lab {
@@ -21,8 +21,8 @@ impl<'a> BaseColor<'a> {
 }
 
 #[derive(Debug)]
-pub struct Palette<'a> {
-    pub name: &'a str,
+pub struct Palette {
+    pub name: &'static str,
     // See: https://github.com/chriskempson/base16/blob/main/styling.md
     // In Base16 framework, [base00..base07] are monotone shades:
     // base00 - default background
@@ -42,5 +42,5 @@ pub struct Palette<'a> {
     // base0d - funcs, headings
     // base0e - keywords, diff changed
     // base0f - deprecated, embeds
-    pub palette: [BaseColor<'a>; 16],
+    pub palette: [BaseColor; 16],
 }
