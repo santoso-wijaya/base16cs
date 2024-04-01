@@ -20,6 +20,7 @@ impl<'a> BaseColor<'a> {
     }
 }
 
+#[derive(Debug)]
 pub struct Palette<'a> {
     pub name: &'a str,
     // See: https://github.com/chriskempson/base16/blob/main/styling.md
