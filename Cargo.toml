@@ -1,18 +1,8 @@
-[package]
-name = "base16cs"
+[workspace]
+members = ["base16cs", "base16cs-cli"]
+resolver = "2"
+
+[workspace.package]
 version = "0.1.0"
-edition = "2021"
 authors = ["Santoso Wijaya <code@swijaya.me>"]
-
-[lib]
-name = "base16cs"
-path = "src/lib.rs"
-
-[[bin]]
-name = "base16cs-bin"
-path = "src/bin.rs"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
-[dependencies]
-color_space = "0.5"
+edition = "2021"
