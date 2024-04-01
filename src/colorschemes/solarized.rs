@@ -20,6 +20,7 @@ pub const YELLOW: BaseColor = BaseColor::new("yellow", 60, 10, 65);
 pub const VIOLET: BaseColor = BaseColor::new("violet", 50, 15, -45);
 
 pub const SOLARIZED_DARK: Palette = Palette {
+    name: "Solarized dark",
     palette: [
         // in Base16 framework:
         BASE03,  // base00 - default background
@@ -42,6 +43,7 @@ pub const SOLARIZED_DARK: Palette = Palette {
 };
 
 pub const SOLARIZED_LIGHT: Palette = Palette {
+    name: "Solarized light",
     palette: [
         // in Base16 framework:
         BASE3,   // base00 - default background

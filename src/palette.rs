@@ -21,6 +21,7 @@ impl<'a> BaseColor<'a> {
 }
 
 pub struct Palette<'a> {
+    pub name: &'a str,
     // See: https://github.com/chriskempson/base16/blob/main/styling.md
     // In Base16 framework, [base00..base07] are monotone shades:
     // base00 - default background
