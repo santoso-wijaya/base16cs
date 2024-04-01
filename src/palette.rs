@@ -1,11 +1,13 @@
 use color_space::Lab;
 
+#[derive(Debug)]
 pub struct BaseColor<'a> {
     pub name: &'a str,
     pub lab: Lab,
 }
 
 impl<'a> BaseColor<'a> {
+    #[inline]
     pub const fn new(name: &'a str, l: i32, a: i32, b: i32) -> BaseColor {
         BaseColor {
             name,

@@ -1,6 +1,5 @@
-mod palette;
-mod selenized;
-mod solarized;
+pub mod colorschemes;
+pub mod palette;
 
 pub fn add(left: usize, right: usize) -> usize {
     left + right
