@@ -1,3 +1,4 @@
+use anyhow::{Context, Result};
 use clap::Parser;
 
 use base16cs::colorschemes;
@@ -14,7 +15,7 @@ struct Cli {
     template: std::path::PathBuf,
 }
 
-fn main() {
+fn main() -> Result<()> {
     let args = Cli::parse();
     let colorschemes = colorschemes::all();
 
@@ -25,4 +26,18 @@ fn main() {
             std::process::exit(exitcode::CONFIG);
         }
     }
+
+    let path = args.template.as_path();
+    let template = liquid::ParserBuilder::with_stdlib()
+        .build()
+        .unwrap()
+        .parse_file(path)
+        .with_context(|| {
+            format!(
+                "Could not parse as a Liquid template file: \"{}\"",
+                path.to_str().unwrap()
+            )
+        })?;
+
+    Ok(())
 }
