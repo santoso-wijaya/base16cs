@@ -81,7 +81,9 @@ checksum = "f1fdabc7756949593fe60f30ec81974b613357de856987752631dea1e3394c80"
 name = "base16cs"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
  "color_space",
+ "liquid",
 ]
 
 [[package]]
@@ -92,7 +94,6 @@ dependencies = [
  "base16cs",
  "clap",
  "exitcode",
- "liquid",
 ]
 
 [[package]]

@@ -15,4 +15,6 @@ path = "src/bin.rs"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+anyhow = { version = "1.0" }
 color_space = "0.5"
+liquid = "0.26.4"

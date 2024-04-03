@@ -1,5 +1,6 @@
 pub mod colorschemes;
 pub mod palette;
+pub mod template;
 
 pub fn add(left: usize, right: usize) -> usize {
     left + right

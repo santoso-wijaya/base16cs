@@ -1,7 +1,8 @@
-use anyhow::{Context, Result};
+use anyhow::Result;
 use clap::Parser;
 
 use base16cs::colorschemes;
+use base16cs::template::liquid::LiquidTemplate;
 
 /// Load a Liquid template file and render it with the values of a colorschemes
 /// palette.
@@ -28,16 +29,7 @@ fn main() -> Result<()> {
     }
 
     let path = args.template.as_path();
-    let template = liquid::ParserBuilder::with_stdlib()
-        .build()
-        .unwrap()
-        .parse_file(path)
-        .with_context(|| {
-            format!(
-                "Could not parse as a Liquid template file: \"{}\"",
-                path.to_str().unwrap()
-            )
-        })?;
+    let template = LiquidTemplate::parse_file(path)?;
 
     Ok(())
 }
