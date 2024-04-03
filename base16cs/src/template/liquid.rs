@@ -2,32 +2,42 @@ use crate::palette::Palette;
 use crate::template::PaletteRenderer;
 
 use anyhow::{Context, Result};
-use liquid::{ParserBuilder, Template};
 
 pub struct LiquidTemplate {
+    path_str: String,
     /// A parsed Liquid template object.
-    template: Template,
+    template: liquid::Template,
 }
 
 impl LiquidTemplate {
     /// Instantiate a LiquidTemplate by parsing the given file.
     /// The resulting template object will be ready for rendering given context.
     pub fn parse_file(path: &std::path::Path) -> Result<Self> {
-        let parser = ParserBuilder::with_stdlib().build().unwrap();
+        let parser = liquid::ParserBuilder::with_stdlib().build().unwrap();
+        let path_str = String::from(path.to_str().unwrap());
+
         let template = parser.parse_file(path).with_context(|| {
             format!(
                 "Could not parse as a Liquid template file: \"{}\"",
-                path.to_str().unwrap()
+                path_str
             )
         })?;
 
-        Ok(Self { template })
+        Ok(Self { path_str, template })
     }
 }
 
 impl PaletteRenderer for LiquidTemplate {
-    fn render(&self, palette: &Palette) -> String {
-        // TODO: Implement
-        String::from("")
+    fn render(&self, palette: &Palette) -> Result<String> {
+        let globals = liquid::to_object(palette)
+            .with_context(|| format!("Could not serialize palette:\n{:?}", palette))?;
+        let rendered = self.template.render(&globals).with_context(|| {
+            format!(
+                "Could not render Liquid template \"{}\" with palette:\n{:?}",
+                self.path_str, palette
+            )
+        })?;
+
+        Ok(rendered)
     }
 }
