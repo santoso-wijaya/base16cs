@@ -1,6 +1,8 @@
-use color_space::Lab;
+use crate::colorspace::Lab;
 
-#[derive(Debug)]
+use serde::{Deserialize, Serialize};
+
+#[derive(Serialize, Deserialize, Debug)]
 pub struct BaseColor {
     pub name: &'static str,
     pub lab: Lab,
@@ -11,16 +13,12 @@ impl BaseColor {
     pub const fn new(name: &'static str, l: i32, a: i32, b: i32) -> BaseColor {
         BaseColor {
             name,
-            lab: Lab {
-                l: l as f64,
-                a: a as f64,
-                b: b as f64,
-            },
+            lab: Lab { l, a, b },
         }
     }
 }
 
-#[derive(Debug)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct Palette {
     pub name: &'static str,
     // See: https://github.com/chriskempson/base16/blob/main/styling.md

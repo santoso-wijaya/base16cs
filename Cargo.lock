@@ -84,6 +84,7 @@ dependencies = [
  "anyhow",
  "color_space",
  "liquid",
+ "serde",
 ]
 
 [[package]]
