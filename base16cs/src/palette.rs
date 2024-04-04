@@ -1,10 +1,12 @@
-use crate::colorspace::Lab;
-
+use crate::colorspace::LabDef;
+use color_space::Lab;
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct BaseColor {
     pub name: &'static str,
+
+    #[serde(with = "LabDef")]
     pub lab: Lab,
 }
 
@@ -13,7 +15,11 @@ impl BaseColor {
     pub const fn new(name: &'static str, l: i32, a: i32, b: i32) -> BaseColor {
         BaseColor {
             name,
-            lab: Lab { l, a, b },
+            lab: Lab {
+                l: l as f64,
+                a: a as f64,
+                b: b as f64,
+            },
         }
     }
 }
