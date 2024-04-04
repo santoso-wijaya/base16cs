@@ -12,7 +12,7 @@ pub struct LabDef {
 
 #[derive(Serialize, Deserialize)]
 #[serde(remote = "Rgb")]
-struct RgbDef {
+pub struct RgbDef {
     pub r: f64,
     pub g: f64,
     pub b: f64,
