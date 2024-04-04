@@ -1,4 +1,4 @@
-use crate::palette::Palette;
+use crate::palette::{DerivedPalette, Palette};
 use crate::template::PaletteRenderer;
 
 use anyhow::{Context, Result};
@@ -29,12 +29,17 @@ impl LiquidTemplate {
 
 impl PaletteRenderer for LiquidTemplate {
     fn render(&self, palette: &Palette) -> Result<String> {
-        let globals = liquid::to_object(palette)
-            .with_context(|| format!("Could not serialize palette:\n{:?}", palette))?;
+        let derived_palette = DerivedPalette::from_palette(palette);
+        let globals = liquid::to_object(&derived_palette).with_context(|| {
+            format!(
+                "Could not serialize derived palette:\n{:?}",
+                derived_palette
+            )
+        })?;
         let rendered = self.template.render(&globals).with_context(|| {
             format!(
-                "Could not render Liquid template \"{}\" with palette:\n{:?}",
-                self.path_str, palette
+                "Could not render Liquid template \"{}\" with derived palette:\n{:?}",
+                self.path_str, derived_palette
             )
         })?;
 

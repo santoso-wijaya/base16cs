@@ -1,4 +1,5 @@
 use crate::colorspace::{LabDef, RgbDef};
+use arrayvec::ArrayVec;
 use color_space::{Lab, Rgb, ToRgb};
 use serde::{Deserialize, Serialize};
 
@@ -26,13 +27,6 @@ impl BaseColor {
             },
         }
     }
-
-    pub fn to_derived_color(&self) -> DerivedColor {
-        DerivedColor {
-            base: self,
-            rgb: self.lab.to_rgb(),
-        }
-    }
 }
 
 /// A color with derived forms.
@@ -46,7 +40,16 @@ pub struct DerivedColor<'a> {
     pub rgb: Rgb,
 }
 
-#[derive(Serialize, Debug)]
+impl<'a> DerivedColor<'a> {
+    pub fn from_base_color(base: &'a BaseColor) -> Self {
+        Self {
+            base,
+            rgb: base.lab.to_rgb(),
+        }
+    }
+}
+
+#[derive(Debug)]
 pub struct Palette {
     pub name: &'static str,
     /// See: https://github.com/chriskempson/base16/blob/main/styling.md
@@ -71,15 +74,25 @@ pub struct Palette {
     pub palette: [BaseColor; 16],
 }
 
-impl Palette {
-    //// Creates a palette with derived colors.
-    // pub fn to_derived_palette(&self) -> DerivedPalette {
-    //     // TODO: Implement
-    // }
-}
-
 #[derive(Serialize, Debug)]
 pub struct DerivedPalette<'a> {
     pub name: String,
     pub palette: [DerivedColor<'a>; 16],
+}
+
+impl<'a> DerivedPalette<'a> {
+    pub fn from_palette(base_palette: &'a Palette) -> Self {
+        let palette: [DerivedColor; 16] = base_palette
+            .palette
+            .iter()
+            .map(DerivedColor::from_base_color)
+            .collect::<ArrayVec<_, 16>>()
+            .into_inner()
+            .unwrap();
+
+        Self {
+            name: String::from(base_palette.name),
+            palette,
+        }
+    }
 }
