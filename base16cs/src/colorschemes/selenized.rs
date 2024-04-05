@@ -2,7 +2,7 @@ use crate::palette::{BaseColor, Palette};
 
 pub const SELENIZED_DARK: Palette = Palette {
     name: "Selenized dark",
-    palette: [
+    colors: [
         // in Base16 framework:
         BaseColor::new("bg_0", 23, -12, -12), // base00 - default background
         BaseColor::new("bg_1", 28, -13, -13), // base01 - lighter bg
@@ -25,7 +25,7 @@ pub const SELENIZED_DARK: Palette = Palette {
 
 pub const SELENIZED_LIGHT: Palette = Palette {
     name: "Selenized light",
-    palette: [
+    colors: [
         // in Base16 framework:
         BaseColor::new("bg_0", 96, 0, 13), // base00 - default background
         BaseColor::new("bg_1", 91, 0, 13), // base01 - darker bg

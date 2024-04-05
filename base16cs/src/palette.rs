@@ -71,19 +71,19 @@ pub struct Palette {
     /// base0d - funcs, headings
     /// base0e - keywords, diff changed
     /// base0f - deprecated, embeds
-    pub palette: [BaseColor; 16],
+    pub colors: [BaseColor; 16],
 }
 
 #[derive(Serialize, Debug)]
 pub struct DerivedPalette<'a> {
     pub name: String,
-    pub palette: [DerivedColor<'a>; 16],
+    pub colors: [DerivedColor<'a>; 16],
 }
 
 impl<'a> DerivedPalette<'a> {
     pub fn from_palette(base_palette: &'a Palette) -> Self {
-        let palette: [DerivedColor; 16] = base_palette
-            .palette
+        let colors: [DerivedColor; 16] = base_palette
+            .colors
             .iter()
             .map(DerivedColor::from_base_color)
             .collect::<ArrayVec<_, 16>>()
@@ -92,7 +92,7 @@ impl<'a> DerivedPalette<'a> {
 
         Self {
             name: String::from(base_palette.name),
-            palette,
+            colors,
         }
     }
 }

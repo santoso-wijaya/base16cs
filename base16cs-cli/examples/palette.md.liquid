@@ -16,13 +16,25 @@ $ cargo run -p base16cs-cli -- \
     text-align: center;
   }
 
-  // TODO: for each base color...
-  .palette tr:nth-child(1) {
-    // TODO: background: #rgb(...);
-  }
+  {% for color in palette.colors %}
+    .palette tr:nth-child({{ forloop.index }}) {
+      background: lab({{ color.base.lab.l }} {{ color.base.lab.a }} {{ color.base.lab.b }});
+    }
+  {% endfor %}
 </style>
 
-| name | L*a*b* | sRGB |
-|------|--------|------|
-// TODO: for each base color...
+<table class="palette">
+  <tr>
+    <th>name</th>
+    <th>L*a*b*</th>
+    <th>sRGB</th>
+  </tr>
+  {% for color in palette.colors %}
+    <tr>
+      <td>{{ color.base.name }}</td>
+      <td>{{ color.base.lab.l }} {{ color.base.lab.a }} {{ color.base.lab.b }}</td>
+      <td>TODO</td>
+    </tr>
+  {% endfor %}
+</table>
 
