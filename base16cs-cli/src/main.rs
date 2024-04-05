@@ -5,7 +5,7 @@ use clap::Parser;
 use base16cs::colorschemes;
 use base16cs::template::liquid::LiquidTemplate;
 
-/// Load a Liquid template file and render it with the values of a colorschemes
+/// Load a Liquid template file and render it with the values of a colorscheme
 /// palette.
 #[derive(Parser)]
 struct Cli {

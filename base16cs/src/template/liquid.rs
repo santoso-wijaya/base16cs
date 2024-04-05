@@ -2,6 +2,7 @@ use crate::palette::{DerivedPalette, Palette};
 use crate::template::PaletteRenderer;
 
 use anyhow::{Context, Result};
+use liquid::model::Value;
 
 pub struct LiquidTemplate {
     path_str: String,
@@ -30,13 +31,17 @@ impl LiquidTemplate {
 impl PaletteRenderer for LiquidTemplate {
     fn render(&self, palette: &Palette) -> Result<String> {
         let derived_palette = DerivedPalette::from_palette(palette);
-        let globals = liquid::to_object(&derived_palette).with_context(|| {
+
+        let palette_obj = liquid::to_object(&derived_palette).with_context(|| {
             format!(
                 "Could not serialize derived palette:\n{:?}",
                 derived_palette
             )
         })?;
-        let rendered = self.template.render(&globals).with_context(|| {
+        let mut obj = liquid::Object::new();
+        obj.insert("palette".into(), Value::Object(palette_obj));
+
+        let rendered = self.template.render(&obj).with_context(|| {
             format!(
                 "Could not render Liquid template \"{}\" with derived palette:\n{:?}",
                 self.path_str, derived_palette
