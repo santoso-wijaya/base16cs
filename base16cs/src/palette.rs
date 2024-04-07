@@ -49,7 +49,7 @@ impl<'a> DerivedColor<'a> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Serialize, Debug)]
 pub struct Palette {
     pub name: &'static str,
     /// See: https://github.com/chriskempson/base16/blob/main/styling.md

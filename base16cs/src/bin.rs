@@ -1,13 +1,18 @@
 use base16cs::colorschemes;
 use base16cs::palette;
+use base16cs::serialize::Serializable;
 
-fn main() {
+use anyhow::Result;
+
+fn main() -> Result<()> {
     for (name, palette) in colorschemes::all().into_iter() {
         print!("\"{name}\": ");
-        print_palette(palette);
+        print_palette_yaml(palette)?
     }
+    Ok(())
 }
 
-fn print_palette(palette: &palette::Palette) {
-    println!("{palette:#?}");
+fn print_palette_yaml(palette: &palette::Palette) -> Result<()> {
+    println!("{}", palette.serialize()?);
+    Ok(())
 }
