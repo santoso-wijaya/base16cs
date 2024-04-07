@@ -1,4 +1,4 @@
-use crate::palette::{BaseColor, Palette};
+use crate::palette::Palette;
 use crate::serialize::Serializable;
 
 use anyhow::{Context, Result};
@@ -11,7 +11,7 @@ impl<'a> Serializable for Palette<'a> {
 }
 
 impl<'a> Palette<'a> {
-    fn from_yaml(yaml: &'a str) -> Result<Palette> {
+    pub fn from_yaml(yaml: &str) -> Result<Palette> {
         serde_yaml::from_str(yaml)
             .with_context(|| format!("Could not deserialize YAML to palette:\n{}", yaml))
     }
@@ -20,6 +20,7 @@ impl<'a> Palette<'a> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::palette::BaseColor;
 
     const PALETTE: Palette = Palette {
         name: "Selenized light",

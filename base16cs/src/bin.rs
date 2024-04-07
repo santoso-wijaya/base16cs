@@ -6,7 +6,7 @@ use anyhow::Result;
 
 fn main() -> Result<()> {
     for (name, palette) in colorschemes::all().into_iter() {
-        print!("\"{name}\": ");
+        println!("\"{name}\":");
         print_palette_yaml(palette)?
     }
     Ok(())
