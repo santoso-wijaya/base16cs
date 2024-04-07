@@ -4,20 +4,20 @@ use color_space::{Lab, Rgb, ToRgb};
 use serde::{Deserialize, Serialize};
 
 /// A base color in its canonical form.
-#[derive(Serialize, Deserialize, Debug)]
-pub struct BaseColor {
+#[derive(Serialize, Deserialize, PartialEq, Debug)]
+pub struct BaseColor<'a> {
     /// This base color's name.
-    pub name: &'static str,
+    pub name: &'a str,
 
     /// This base color's canonical L*a*b* values.
     #[serde(with = "LabDef")]
     pub lab: Lab,
 }
 
-impl BaseColor {
+impl<'a> BaseColor<'a> {
     /// Creates a BaseColor as a compile-time constant.
     #[inline]
-    pub const fn new(name: &'static str, l: i32, a: i32, b: i32) -> BaseColor {
+    pub const fn new(name: &'a str, l: i32, a: i32, b: i32) -> BaseColor {
         BaseColor {
             name,
             lab: Lab {
@@ -33,7 +33,7 @@ impl BaseColor {
 #[derive(Serialize, Debug)]
 pub struct DerivedColor<'a> {
     /// This color's canonical form, as well as its name.
-    pub base: &'a BaseColor,
+    pub base: &'a BaseColor<'a>,
 
     /// This color's derived sRGB values form.
     #[serde(with = "RgbDef")]
@@ -49,9 +49,9 @@ impl<'a> DerivedColor<'a> {
     }
 }
 
-#[derive(Serialize, Debug)]
-pub struct Palette {
-    pub name: &'static str,
+#[derive(Serialize, Deserialize, PartialEq, Debug)]
+pub struct Palette<'a> {
+    pub name: &'a str,
     /// See: https://github.com/chriskempson/base16/blob/main/styling.md
     /// In Base16 framework, [base00..base07] are monotone shades:
     /// base00 - default background
@@ -71,7 +71,7 @@ pub struct Palette {
     /// base0d - funcs, headings
     /// base0e - keywords, diff changed
     /// base0f - deprecated, embeds
-    pub colors: [BaseColor; 16],
+    pub colors: [BaseColor<'a>; 16],
 }
 
 #[derive(Serialize, Debug)]

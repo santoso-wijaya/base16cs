@@ -5,7 +5,7 @@ use crate::palette::Palette;
 use std::collections::HashMap;
 
 /// return all colorschemes keyed by their names
-pub fn all<'a>() -> HashMap<&'a str, &'a Palette> {
+pub fn all<'a>() -> HashMap<&'a str, &'a Palette<'a>> {
     let all_colorschemes = vec![
         &solarized::SOLARIZED_DARK,
         &solarized::SOLARIZED_LIGHT,
