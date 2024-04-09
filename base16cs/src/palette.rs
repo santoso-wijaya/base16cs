@@ -38,14 +38,16 @@ pub struct DerivedColor<'a> {
     /// This color's derived sRGB values form.
     #[serde(with = "RgbDef")]
     pub rgb: Rgb,
+
+    pub rgb_hex: String,
 }
 
 impl<'a> DerivedColor<'a> {
     pub fn from_base_color(base: &'a BaseColor) -> Self {
-        Self {
-            base,
-            rgb: base.lab.to_rgb(),
-        }
+        let rgb = base.lab.to_rgb();
+        let rgb_hex = colors_transform::Rgb::from(rgb.r as f32, rgb.g as f32, rgb.b as f32)
+            .to_css_hex_string();
+        Self { base, rgb, rgb_hex }
     }
 }
 

@@ -16,8 +16,9 @@ path = "src/bin.rs"
 
 [dependencies]
 anyhow = { version = "1.0" }
-arrayvec = "0.7.4"
+arrayvec = { version = "0.7.4", features = ["serde"] }
 color_space = "0.5"
+colors-transform = "0.2.11"
 liquid = "0.26.4"
 serde = { version = "1.0", features = ["derive"] }
 serde_yaml = "0.9.34"
