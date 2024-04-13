@@ -167,8 +167,7 @@ checksum = "98cc8fbded0c607b7ba9dd60cd98df59af97e84d24e49c8557331cfc26d301ce"
 [[package]]
 name = "color_space"
 version = "0.5.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3776b2bcc4e914db501bb9be9572dd706e344b9eb8f882894f3daa651d281381"
+source = "git+https://github.com/santoso-wijaya/color_space.git#847d5684f3c135df3687e4455c30059a6a87fc71"
 
 [[package]]
 name = "colorchoice"
