@@ -41,7 +41,7 @@ mod tests {
             BaseColor::new("cyan", 57, -42, -4), // base0c - regex, escape chars
             BaseColor::new("blue", 46, 0, -60), // base0d - funcs, headings
             BaseColor::new("yellow", 59, 6, 71), // base0e - keywords, diff changed
-            BaseColor::new("violet", 49, 32, -57), // base0f - deprecated, embeds
+            BaseColor::new("violet", 49, 32, -47), // base0f - deprecated, embeds
         ],
     };
 
@@ -126,7 +126,7 @@ colors:
   lab:
     l: 49.0
     a: 32.0
-    b: -57.0
+    b: -47.0
 "#;
 
     #[test]

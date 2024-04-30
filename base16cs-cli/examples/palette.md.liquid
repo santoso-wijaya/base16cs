@@ -27,15 +27,15 @@ $ cargo run -p base16cs-cli -- \
   <tr>
     <th>name</th>
     <th>L*a*b*</th>
-    <th>RGB</th>
+    <th>sRGB</th>
     <th>RGB (#hex)</th>
   </tr>
   {% for color in palette.colors %}
     <tr>
       <td>{{ color.base.name }}</td>
       <td>{{ color.base.lab.l }} {{ color.base.lab.a }} {{ color.base.lab.b }}</td>
-      <td>rgb({{ color.rgb.r | round }} {{ color.rgb.g | round }} {{ color.rgb.b | round }})</td>
-      <td>{{ color.rgb_hex }}</td>
+      <td>rgb({{ color.srgb.red }} {{ color.srgb.green }} {{ color.srgb.blue }})</td>
+      <td>#{{ color.srgb_hex }}</td>
     </tr>
   {% endfor %}
 </table>

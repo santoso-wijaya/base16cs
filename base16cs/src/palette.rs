@@ -1,6 +1,6 @@
-use crate::colorspace::{LabDef, RgbDef};
 use arrayvec::ArrayVec;
-use color_space::{Lab, Rgb, ToRgb};
+use palette::rgb::Srgb;
+use palette::{lab::Lab, IntoColor};
 use serde::{Deserialize, Serialize};
 
 /// A base color in its canonical form.
@@ -9,8 +9,7 @@ pub struct BaseColor<'a> {
     /// This base color's name.
     pub name: &'a str,
 
-    /// This base color's canonical L*a*b* values.
-    #[serde(with = "LabDef")]
+    /// This base color's canonical CIE L*a*b* values.
     pub lab: Lab,
 }
 
@@ -20,11 +19,7 @@ impl<'a> BaseColor<'a> {
     pub const fn new(name: &'a str, l: i32, a: i32, b: i32) -> BaseColor {
         BaseColor {
             name,
-            lab: Lab {
-                l: l as f64,
-                a: a as f64,
-                b: b as f64,
-            },
+            lab: Lab::new(l as f32, a as f32, b as f32),
         }
     }
 }
@@ -36,18 +31,23 @@ pub struct DerivedColor<'a> {
     pub base: &'a BaseColor<'a>,
 
     /// This color's derived sRGB values form.
-    #[serde(with = "RgbDef")]
-    pub rgb: Rgb,
+    pub srgb: Srgb<u8>,
 
-    pub rgb_hex: String,
+    /// This color's derived sRGB values, in stringified hex form ("{:x}").
+    pub srgb_hex: String,
 }
 
 impl<'a> DerivedColor<'a> {
     pub fn from_base_color(base: &'a BaseColor) -> Self {
-        let rgb = base.lab.to_rgb();
-        let rgb_hex = colors_transform::Rgb::from(rgb.r as f32, rgb.g as f32, rgb.b as f32)
-            .to_css_hex_string();
-        Self { base, rgb, rgb_hex }
+        let srgb: Srgb = base.lab.into_color();
+        let srgb_u8: Srgb<u8> = srgb.into_format();
+        let srgb_hex = format!("{:x}", srgb_u8);
+
+        Self {
+            base,
+            srgb: srgb_u8,
+            srgb_hex,
+        }
     }
 }
 
