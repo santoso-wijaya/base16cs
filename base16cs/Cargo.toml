@@ -18,7 +18,6 @@ path = "src/bin.rs"
 anyhow = { version = "1.0" }
 arrayvec = { version = "0.7.4", features = ["serde"] }
 palette = { version = "0.7.6", features = ["serializing"] }
-colors-transform = "0.2.11"
 liquid = "0.26.4"
 serde = { version = "1.0" }
 serde_yaml = "0.9.34"
