@@ -10,6 +10,8 @@ pub struct LiquidTemplate {
     path: PathBuf,
     /// A parsed Liquid template object.
     template: Template,
+    // TODO:  Add support for partials.
+    // See: https://github.com/cobalt-org/liquid-rust/issues/509
 }
 
 impl LiquidTemplate {
