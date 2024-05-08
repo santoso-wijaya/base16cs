@@ -1,6 +1,9 @@
 use anyhow::{Context, Result};
+use glob::glob;
 use liquid::model::{to_value, KString};
-use liquid::{Object, ParserBuilder, Template};
+use liquid::partials::{EagerCompiler, InMemorySource};
+use liquid::{Object, Parser, ParserBuilder, Template};
+use std::fs::read_to_string;
 use std::path::{Path, PathBuf};
 
 use crate::palette::{DerivedPalette, Palette};
@@ -10,24 +13,61 @@ pub struct LiquidTemplate {
     path: PathBuf,
     /// A parsed Liquid template object.
     template: Template,
-    // TODO:  Add support for partials.
-    // See: https://github.com/cobalt-org/liquid-rust/issues/509
 }
+
+type Partials = EagerCompiler<InMemorySource>;
 
 impl LiquidTemplate {
     /// Instantiate a LiquidTemplate by parsing the given file.
+    ///
     /// The resulting template object will be ready for rendering given context.
-    pub fn parse_file(path: &Path) -> Result<Self> {
-        let parser = ParserBuilder::with_stdlib().build().unwrap();
+    ///
+    /// * `path` - The path to the file to parse as a Liquid template.
+    /// * `partials_dir` - Optional path to a directory where template partials
+    ///   can be searched for `{% render %}`.
+    pub fn parse_file(path: &Path, partials_dir: Option<&Path>) -> Result<Self> {
+        let parser = LiquidTemplate::build_parser(partials_dir)?;
 
-        let template = parser.parse_file(path).with_context(|| {
-            format!("Could not parse as a Liquid template file: \"{:?}\"", path)
-        })?;
+        let template = parser
+            .parse_file(path)
+            .with_context(|| format!("Could not parse Liquid template file: \"{:?}\"", path))?;
 
         Ok(Self {
             path: path.to_path_buf(),
             template,
         })
+    }
+
+    /// Build a Liquid Parser and, optionally, preload it with template partials.
+    fn build_parser(partials_dir: Option<&Path>) -> Result<Parser> {
+        let partials_result: Option<Result<Partials>> =
+            partials_dir.map(LiquidTemplate::parse_partials);
+
+        let mut parser_builder = ParserBuilder::with_stdlib();
+        parser_builder = match partials_result {
+            None => parser_builder,
+            Some(result) => parser_builder.partials(result?),
+        };
+
+        Ok(parser_builder.build()?)
+    }
+
+    fn parse_partials(dirpath: &Path) -> Result<Partials> {
+        let mut partials = Partials::empty();
+
+        let pattern = format!("{}/*.liquid", dirpath.to_str().unwrap());
+        let matching_paths = glob(&pattern[..])?;
+
+        for path in matching_paths.filter_map(core::result::Result::ok) {
+            let basename = String::from(path.file_name().unwrap().to_str().unwrap());
+            let filepath = String::from(path.to_str().unwrap());
+            let contents = read_to_string(path)
+                .with_context(|| format!("Could not read partial file: {}", filepath))?;
+
+            partials.add(basename, contents);
+        }
+
+        Ok(partials)
     }
 }
 
@@ -44,6 +84,7 @@ impl PaletteRenderer for LiquidTemplate {
         let mut obj = Object::new();
         obj.insert("palette".into(), palette_obj_value);
 
+        // Insert each color's sRGB hex string as values keyed to the color's names.
         if unroll_colors_hex {
             for derived_color in derived_palette.colors.iter() {
                 let srgb_hex_value = to_value(&derived_color.srgb_hex).with_context(|| {
@@ -105,7 +146,7 @@ mod tests {
 
     fn create_liquid_template(tmpdir: &TempDir, template_content: &str) -> LiquidTemplate {
         let tempfile_path = write_to_file(tmpdir, template_content).unwrap();
-        LiquidTemplate::parse_file(tempfile_path.as_path()).unwrap()
+        LiquidTemplate::parse_file(tempfile_path.as_path(), None).unwrap()
     }
 
     fn write_to_file(tmpdir: &TempDir, content: &str) -> Result<PathBuf> {

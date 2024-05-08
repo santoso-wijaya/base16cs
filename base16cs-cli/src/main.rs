@@ -15,6 +15,9 @@ struct Cli {
     /// The path to the yaml file of the palette to load.
     #[arg(short = 'p', long = "palette")]
     palette: PathBuf,
+    /// The path to a directory for loading partial Liquid templates.
+    #[arg(short = 'd', long = "partials_dir")]
+    partials_dir: Option<PathBuf>,
     /// Whether to unroll `color` objects into hex strings with their names as Liquid keys.
     #[arg(short = 'u', long = "unroll_colors_hex")]
     unroll_colors_hex: bool,
@@ -31,7 +34,12 @@ fn main() -> Result<()> {
 
     let output = match args.template {
         None => print_derived_palette(&palette),
-        Some(template_path) => render_template(template_path, &palette, args.unroll_colors_hex),
+        Some(template_path) => render_template(
+            template_path,
+            args.partials_dir.as_ref(),
+            &palette,
+            args.unroll_colors_hex,
+        ),
     }?;
 
     println!("{}", output);
@@ -44,7 +52,12 @@ fn print_derived_palette(palette: &Palette) -> Result<String> {
     derived_palette.serialize()
 }
 
-fn render_template(path: PathBuf, palette: &Palette, unroll_colors_hex: bool) -> Result<String> {
-    let template = LiquidTemplate::parse_file(path.as_path())?;
+fn render_template(
+    path: PathBuf,
+    partials_dir: Option<&PathBuf>,
+    palette: &Palette,
+    unroll_colors_hex: bool,
+) -> Result<String> {
+    let template = LiquidTemplate::parse_file(path.as_path(), partials_dir.map(PathBuf::as_path))?;
     template.render(palette, unroll_colors_hex)
 }
