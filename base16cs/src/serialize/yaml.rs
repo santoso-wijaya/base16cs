@@ -1,7 +1,15 @@
+use crate::palette::DerivedPalette;
 use crate::palette::Palette;
 use crate::serialize::Serializable;
 
 use anyhow::{Context, Result};
+
+impl Palette {
+    pub fn from_yaml(yaml: &str) -> Result<Palette> {
+        serde_yaml::from_str(yaml)
+            .with_context(|| format!("Could not deserialize YAML to palette:\n{}", yaml))
+    }
+}
 
 impl Serializable for Palette {
     fn serialize(&self) -> Result<String> {
@@ -10,10 +18,10 @@ impl Serializable for Palette {
     }
 }
 
-impl Palette {
-    pub fn from_yaml(yaml: &str) -> Result<Palette> {
-        serde_yaml::from_str(yaml)
-            .with_context(|| format!("Could not deserialize YAML to palette:\n{}", yaml))
+impl<'a> Serializable for DerivedPalette<'a> {
+    fn serialize(&self) -> Result<String> {
+        serde_yaml::to_string(self)
+            .with_context(|| format!("Could not serialize derived palette to YAML:\n{:?}", self))
     }
 }
 
@@ -27,22 +35,22 @@ mod tests {
             "Selenized light",
             [
                 // in Base16 framework:
-                BaseColor::new("bg_0", 96, 0, 13),        // base00 - default background
-                BaseColor::new("bg_1", 91, 0, 13),        // base01 - darker bg
-                BaseColor::new("bg_2", 82, 0, 13),        // base02 - selection bg
-                BaseColor::new("dim_0", 62, -4, 1),       // base03 - comments, invis
-                BaseColor::new("fg_0", 42, -6, -6),       // base04 - light foreground
-                BaseColor::new("fg_1", 31, -6, -6),       // base05 - default foreground
+                BaseColor::new("bg_0", 96, 0, 13), // base00 - default background
+                BaseColor::new("bg_1", 91, 0, 13), // base01 - darker bg
+                BaseColor::new("bg_2", 82, 0, 13), // base02 - selection bg
+                BaseColor::new("dim_0", 62, -4, 1), // base03 - comments, invis
+                BaseColor::new("fg_0", 42, -6, -6), // base04 - light foreground
+                BaseColor::new("fg_1", 31, -6, -6), // base05 - default foreground
                 BaseColor::new("unused_0", 28, -13, -13), // base06 - dark fg - unused
                 BaseColor::new("unused_1", 23, -12, -12), // base07 - dark bg - unused
-                BaseColor::new("red", 46, 66, 42),        // base08 - vars, diff deleted
-                BaseColor::new("orange", 52, 39, 52),     // base09 - ints, bools, consts
-                BaseColor::new("magenta", 52, 58, -16),   // base0a - classes, search bg
-                BaseColor::new("green", 54, -40, 58),     // base0b - strings, diff inserted
-                BaseColor::new("cyan", 57, -42, -4),      // base0c - regex, escape chars
-                BaseColor::new("blue", 46, 0, -60),       // base0d - funcs, headings
-                BaseColor::new("yellow", 59, 6, 71),      // base0e - keywords, diff changed
-                BaseColor::new("violet", 49, 32, -47),    // base0f - deprecated, embeds
+                BaseColor::new("red", 46, 66, 42), // base08 - vars, diff deleted
+                BaseColor::new("orange", 52, 39, 52), // base09 - ints, bools, consts
+                BaseColor::new("magenta", 52, 58, -16), // base0a - classes, search bg
+                BaseColor::new("green", 54, -40, 58), // base0b - strings, diff inserted
+                BaseColor::new("cyan", 57, -42, -4), // base0c - regex, escape chars
+                BaseColor::new("blue", 46, 0, -60), // base0d - funcs, headings
+                BaseColor::new("yellow", 59, 6, 71), // base0e - keywords, diff changed
+                BaseColor::new("violet", 49, 32, -47), // base0f - deprecated, embeds
             ],
         )
     }
