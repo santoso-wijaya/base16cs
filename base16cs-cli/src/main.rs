@@ -15,9 +15,9 @@ struct Cli {
     /// The path to the yaml file of the palette to load.
     #[arg(short = 'p', long = "palette")]
     palette: PathBuf,
-    /// Whether to unroll `color` objects with their names as Liquid keys.
-    #[arg(short = 'u', long = "unroll_colors")]
-    unroll_colors: bool,
+    /// Whether to unroll `color` objects into hex strings with their names as Liquid keys.
+    #[arg(short = 'u', long = "unroll_colors_hex")]
+    unroll_colors_hex: bool,
     /// The path to the template file to read.
     /// Without a template file, print the derived palette yaml and exit.
     template: Option<PathBuf>,
@@ -31,7 +31,7 @@ fn main() -> Result<()> {
 
     let output = match args.template {
         None => print_derived_palette(&palette),
-        Some(template_path) => render_template(template_path, &palette, args.unroll_colors),
+        Some(template_path) => render_template(template_path, &palette, args.unroll_colors_hex),
     }?;
 
     println!("{}", output);
@@ -44,7 +44,7 @@ fn print_derived_palette(palette: &Palette) -> Result<String> {
     derived_palette.serialize()
 }
 
-fn render_template(path: PathBuf, palette: &Palette, unroll_colors: bool) -> Result<String> {
+fn render_template(path: PathBuf, palette: &Palette, unroll_colors_hex: bool) -> Result<String> {
     let template = LiquidTemplate::parse_file(path.as_path())?;
-    template.render(palette, unroll_colors)
+    template.render(palette, unroll_colors_hex)
 }

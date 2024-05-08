@@ -16,47 +16,33 @@ $ cargo run -p base16cs-cli -- \
   <thead>
     <tr>
       <th>name</th>
-      <th>L*a*b*</th>
-      <th>sRGB</th>
       <th>RGB (#hex)</th>
     </tr>
   </thead>
   <tbody>
     <tr>
-    <td>{{ bg_0.base.name }}</td>
-      <td>{{ bg_0.base.lab.l }} {{ bg_0.base.lab.a }} {{ bg_0.base.lab.b }}</td>
-      <td>rgb({{ bg_0.srgb.red }} {{ bg_0.srgb.green }} {{ bg_0.srgb.blue }})</td>
-      <td>#{{ bg_0.srgb_hex }}</td>
+    <td>bg_0</td>
+      <td>#{{ bg_0 }}</td>
     </tr>
     <tr>
-    <td>{{ bg_1.base.name }}</td>
-      <td>{{ bg_1.base.lab.l }} {{ bg_1.base.lab.a }} {{ bg_1.base.lab.b }}</td>
-      <td>rgb({{ bg_1.srgb.red }} {{ bg_1.srgb.green }} {{ bg_1.srgb.blue }})</td>
-      <td>#{{ bg_1.srgb_hex }}</td>
+    <td>bg_1</td>
+      <td>#{{ bg_1 }}</td>
     </tr>
     <tr>
-    <td>{{ bg_2.base.name }}</td>
-      <td>{{ bg_2.base.lab.l }} {{ bg_2.base.lab.a }} {{ bg_2.base.lab.b }}</td>
-      <td>rgb({{ bg_2.srgb.red }} {{ bg_2.srgb.green }} {{ bg_2.srgb.blue }})</td>
-      <td>#{{ bg_2.srgb_hex }}</td>
+    <td>bg_2</td>
+      <td>#{{ bg_2 }}</td>
     </tr>
     <tr>
-    <td>{{ dim_0.base.name }}</td>
-      <td>{{ dim_0.base.lab.l }} {{ dim_0.base.lab.a }} {{ dim_0.base.lab.b }}</td>
-      <td>rgb({{ dim_0.srgb.red }} {{ dim_0.srgb.green }} {{ dim_0.srgb.blue }})</td>
-      <td>#{{ dim_0.srgb_hex }}</td>
+    <td>dim_0</td>
+      <td>#{{ dim_0 }}</td>
     </tr>
     <tr>
-    <td>{{ fg_0.base.name }}</td>
-      <td>{{ fg_0.base.lab.l }} {{ fg_0.base.lab.a }} {{ fg_0.base.lab.b }}</td>
-      <td>rgb({{ fg_0.srgb.red }} {{ fg_0.srgb.green }} {{ fg_0.srgb.blue }})</td>
-      <td>#{{ fg_0.srgb_hex }}</td>
+    <td>fg_0</td>
+      <td>#{{ fg_0 }}</td>
     </tr>
     <tr>
-    <td>{{ fg_1.base.name }}</td>
-      <td>{{ fg_1.base.lab.l }} {{ fg_1.base.lab.a }} {{ fg_1.base.lab.b }}</td>
-      <td>rgb({{ fg_1.srgb.red }} {{ fg_1.srgb.green }} {{ fg_1.srgb.blue }})</td>
-      <td>#{{ fg_1.srgb_hex }}</td>
+    <td>fg_1</td>
+      <td>#{{ fg_1 }}</td>
     </tr>
   </tbody>
 </table>
