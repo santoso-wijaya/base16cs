@@ -29,7 +29,7 @@ impl LiquidTemplate {
 }
 
 impl PaletteRenderer for LiquidTemplate {
-    fn render(&self, palette: &Palette, unroll_names: bool) -> Result<String> {
+    fn render(&self, palette: &Palette, unroll_colors: bool) -> Result<String> {
         let derived_palette = DerivedPalette::from_palette(palette);
 
         let palette_obj = liquid::to_object(&derived_palette).with_context(|| {
@@ -40,13 +40,15 @@ impl PaletteRenderer for LiquidTemplate {
         })?;
         let mut obj = liquid::Object::new();
         obj.insert("palette".into(), Value::Object(palette_obj));
-        if unroll_names {
-            for color in derived_palette.colors.iter() {
-                let color_obj = liquid::to_object(&color)
-                    .with_context(|| format!("Could not serialize color:\n{:?}", color))?;
+
+        if unroll_colors {
+            for derived_color in derived_palette.colors.iter() {
+                let derived_color_obj = liquid::to_object(&derived_color).with_context(|| {
+                    format!("Could not serialize derived color:\n{:?}", derived_color)
+                })?;
                 obj.insert(
-                    String::from(color.base.name).into(),
-                    Value::Object(color_obj),
+                    derived_color.base.name.clone().into(),
+                    Value::Object(derived_color_obj),
                 );
             }
         }

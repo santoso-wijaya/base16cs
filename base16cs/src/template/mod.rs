@@ -12,7 +12,7 @@ pub trait PaletteRenderer {
     /// with the key `"palette"`.
     ///
     /// * `palette` - The given Palette object reference.
-    /// * `unroll_names` - Whether to unroll the colors in `palette` as objects
-    ///   with their own keys.
-    fn render(&self, palette: &Palette, unroll_names: bool) -> Result<String>;
+    /// * `unroll_colors` - Whether to unroll the colors in `palette` as objects
+    ///   with their own names as keys.
+    fn render(&self, palette: &Palette, unroll_colors: bool) -> Result<String>;
 }

@@ -102,6 +102,7 @@ dependencies = [
  "anyhow",
  "arrayvec",
  "liquid",
+ "num-traits",
  "palette",
  "serde",
  "serde_yaml",

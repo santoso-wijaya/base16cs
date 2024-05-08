@@ -8,10 +8,6 @@ authors = ["Santoso Wijaya <code@swijaya.me>"]
 name = "base16cs"
 path = "src/lib.rs"
 
-[[bin]]
-name = "base16cs-bin"
-path = "src/bin.rs"
-
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
@@ -19,5 +15,6 @@ anyhow = { version = "1.0" }
 arrayvec = { version = "0.7.4", features = ["serde"] }
 palette = { version = "0.7.6", features = ["serializing"] }
 liquid = "0.26.4"
+num-traits = "0.2"
 serde = { version = "1.0" }
 serde_yaml = "0.9.34"

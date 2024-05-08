@@ -13,8 +13,8 @@ struct Cli {
     #[arg(short = 'p', long = "palette")]
     palette: std::path::PathBuf,
     /// Whether to unroll `color` objects with their names as Liquid keys
-    #[arg(short = 'u', long = "unroll_names")]
-    unroll_names: bool,
+    #[arg(short = 'u', long = "unroll_colors")]
+    unroll_colors: bool,
     /// The path to the template file to read
     #[arg(short = 't', long = "template")]
     template: std::path::PathBuf,
@@ -28,7 +28,7 @@ fn main() -> Result<()> {
 
     let path = args.template.as_path();
     let template = LiquidTemplate::parse_file(path)?;
-    let rendered = template.render(&palette, args.unroll_names)?;
+    let rendered = template.render(&palette, args.unroll_colors)?;
 
     println!("{}", rendered);
 
