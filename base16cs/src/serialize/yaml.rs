@@ -30,7 +30,10 @@ mod tests {
     use super::*;
     use crate::palette::BaseColor;
 
-    fn create_palette() -> Palette {
+    use rstest::*;
+
+    #[fixture]
+    fn palette() -> Palette {
         Palette::new(
             "Selenized light",
             [
@@ -139,19 +142,19 @@ colors:
     b: -47.0
 "#;
 
-    #[test]
-    fn test_yaml_serialize() -> Result<()> {
-        let yaml = create_palette().serialize()?;
+    #[rstest]
+    fn test_yaml_serialize(palette: Palette) -> Result<()> {
+        let yaml = palette.serialize()?;
         assert_eq!(yaml, PALETTE_YAML);
 
         Ok(())
     }
 
-    #[test]
-    fn test_yaml_deserialize() -> Result<()> {
+    #[rstest]
+    fn test_yaml_deserialize(palette: Palette) -> Result<()> {
         let yaml = String::from(PALETTE_YAML);
-        let palette = Palette::from_yaml(yaml.as_str())?;
-        assert_eq!(palette, create_palette());
+        let de_palette = Palette::from_yaml(yaml.as_str())?;
+        assert_eq!(de_palette, palette);
 
         Ok(())
     }

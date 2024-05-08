@@ -21,4 +21,5 @@ serde = { version = "1.0" }
 serde_yaml = "0.9.34"
 
 [dev-dependencies]
+rstest = "0.19"
 tempdir = "0.3"

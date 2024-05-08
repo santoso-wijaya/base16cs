@@ -116,10 +116,12 @@ mod tests {
     use super::*;
     use crate::palette::BaseColor;
 
+    use rstest::*;
     use std::fs::write;
     use tempdir::TempDir;
 
-    fn create_palette() -> Palette {
+    #[fixture]
+    fn palette() -> Palette {
         Palette::new(
             "Selenized light",
             [
@@ -144,22 +146,46 @@ mod tests {
         )
     }
 
-    fn create_liquid_template(tmpdir: &TempDir, template_content: &str) -> LiquidTemplate {
-        let tempfile_path = write_to_file(tmpdir, template_content).unwrap();
-        LiquidTemplate::parse_file(tempfile_path.as_path(), None).unwrap()
+    struct TempDirFixture {
+        tmpdir: TempDir,
     }
 
-    fn write_to_file(tmpdir: &TempDir, content: &str) -> Result<PathBuf> {
-        let filepath = tmpdir.path().join("test-template.liquid");
-        write(filepath.clone(), content)?;
+    const LIQUID_TEMPLATE_FILENAME: &str = "test.liquid";
 
-        Ok(filepath)
+    impl TempDirFixture {
+        /// Creates/overwrites a Liquid template file ("test.liquid") with the given contents.
+        ///
+        /// Returns a LiquidTemplate object that is parsed from said contents.
+        ///
+        /// Note that the Liquid parser used here does not compile any partials.
+        fn create_liquid_template_no_partials(
+            &self,
+            template_contents: &str,
+        ) -> Result<LiquidTemplate> {
+            let tempfile_path = self.write_to_file(LIQUID_TEMPLATE_FILENAME, template_contents)?;
+            LiquidTemplate::parse_file(tempfile_path.as_path(), None)
+        }
+
+        /// Writes the given UTF-8 contents string into a file in this TempDir fixture.
+        ///
+        /// Returns a full filepath to the newly created file.
+        fn write_to_file(&self, filename: &str, contents: &str) -> Result<PathBuf> {
+            let filepath = self.tmpdir.path().join(filename);
+            write(filepath.clone(), contents)?;
+
+            Ok(filepath)
+        }
     }
 
-    #[test]
-    fn test_render_palette() -> Result<()> {
-        let tmpdir = TempDir::new("tests")?;
+    #[fixture]
+    fn tmpdir() -> TempDirFixture {
+        TempDirFixture {
+            tmpdir: TempDir::new("tests").unwrap(),
+        }
+    }
 
+    #[rstest]
+    fn test_render_palette(tmpdir: TempDirFixture, palette: Palette) -> Result<()> {
         let liquid_template_content = r#"
             {%- for color in palette.colors limit: 3 %}
 
@@ -184,21 +210,17 @@ mod tests {
                 - rgb(214 203 180)
         "#;
 
-        let palette = create_palette();
-        let liquid_template = create_liquid_template(&tmpdir, liquid_template_content);
+        let liquid_template = tmpdir.create_liquid_template_no_partials(liquid_template_content)?;
 
         let rendered = liquid_template.render(&palette, true)?;
 
         assert_eq!(liquid_template_rendered, rendered);
 
-        tmpdir.close()?;
         Ok(())
     }
 
-    #[test]
-    fn test_render_unroll_colors_hex() -> Result<()> {
-        let tmpdir = TempDir::new("tests")?;
-
+    #[rstest]
+    fn test_render_unroll_colors_hex(tmpdir: TempDirFixture, palette: Palette) -> Result<()> {
         let liquid_template_content = r#"
             bg_0: #{{ bg_0 }}
             bg_1: #{{ bg_1 }}
@@ -208,33 +230,27 @@ mod tests {
             bg_1: #f0e4cc
         "#;
 
-        let palette = create_palette();
-        let liquid_template = create_liquid_template(&tmpdir, liquid_template_content);
+        let liquid_template = tmpdir.create_liquid_template_no_partials(liquid_template_content)?;
 
         let rendered = liquid_template.render(&palette, true)?;
 
         assert_eq!(liquid_template_rendered, rendered);
 
-        tmpdir.close()?;
         Ok(())
     }
 
-    #[test]
-    fn test_render_no_unroll_colors_hex() -> Result<()> {
-        let tmpdir = TempDir::new("tests")?;
-
+    #[rstest]
+    fn test_render_no_unroll_colors_hex(tmpdir: TempDirFixture, palette: Palette) -> Result<()> {
         let liquid_template_content = r#"
             bg_0: #{{ bg_0 }}
             bg_1: #{{ bg_1 }}
         "#;
 
-        let palette = create_palette();
-        let liquid_template = create_liquid_template(&tmpdir, liquid_template_content);
+        let liquid_template = tmpdir.create_liquid_template_no_partials(liquid_template_content)?;
 
         let result = liquid_template.render(&palette, false);
         result.expect_err("Should not have been able to render template with unrolled color names");
 
-        tmpdir.close()?;
         Ok(())
     }
 }
