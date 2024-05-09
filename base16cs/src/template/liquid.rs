@@ -1,7 +1,7 @@
 use anyhow::{Context, Result};
 use glob::glob;
 use liquid::model::{to_value, KString};
-use liquid::partials::{EagerCompiler, InMemorySource};
+use liquid::partials::{EagerCompiler, InMemorySource, PartialSource};
 use liquid::{Object, Parser, ParserBuilder, Template};
 use std::fs::read_to_string;
 use std::path::{Path, PathBuf};
@@ -23,10 +23,10 @@ impl LiquidTemplate {
     /// The resulting template object will be ready for rendering given context.
     ///
     /// * `path` - The path to the file to parse as a Liquid template.
-    /// * `partials_dir` - Optional path to a directory where template partials
-    ///   can be searched for `{% render %}`.
-    pub fn parse_file(path: &Path, partials_dir: Option<&Path>) -> Result<Self> {
-        let parser = LiquidTemplate::build_parser(partials_dir)?;
+    /// * `partials_dirs` - Paths to directories, if any, where template partials
+    ///   can be searched for `{% render %}` or `{% include %}` directive tags.
+    pub fn parse_file(path: &Path, partials_dirs: Vec<PathBuf>) -> Result<Self> {
+        let parser = LiquidTemplate::build_parser(partials_dirs)?;
 
         let template = parser
             .parse_file(path)
@@ -39,22 +39,32 @@ impl LiquidTemplate {
     }
 
     /// Build a Liquid Parser and, optionally, preload it with template partials.
-    fn build_parser(partials_dir: Option<&Path>) -> Result<Parser> {
-        let partials_result: Option<Result<Partials>> =
-            partials_dir.map(LiquidTemplate::parse_partials);
-
-        let mut parser_builder = ParserBuilder::with_stdlib();
-        parser_builder = match partials_result {
-            None => parser_builder,
-            Some(result) => parser_builder.partials(result?),
+    fn build_parser(partials_dirs: Vec<PathBuf>) -> Result<Parser> {
+        let partials = {
+            let mut _partials = Partials::empty();
+            for dirpath in partials_dirs {
+                LiquidTemplate::parse_partials(dirpath.as_path(), &mut _partials)?;
+            }
+            _partials
         };
 
-        Ok(parser_builder.build()?)
+        let has_partials = !partials.names().is_empty();
+        let parser = {
+            let mut builder = ParserBuilder::with_stdlib();
+            builder = if has_partials {
+                builder.partials(partials)
+            } else {
+                builder
+            };
+
+            builder.build()?
+        };
+
+        Ok(parser)
     }
 
-    fn parse_partials(dirpath: &Path) -> Result<Partials> {
-        let mut partials = Partials::empty();
-
+    /// Parses all `.liquid` files in the given directory, and insert them into the given partials.
+    fn parse_partials(dirpath: &Path, partials: &mut Partials) -> Result<()> {
         let pattern = format!("{}/*.liquid", dirpath.to_str().unwrap());
         let matching_paths = glob(&pattern[..])?;
 
@@ -64,10 +74,12 @@ impl LiquidTemplate {
             let contents = read_to_string(path)
                 .with_context(|| format!("Could not read partial file: {}", filepath))?;
 
+            // TODO: Handle the case when basename conflicts (with same-named file from a different
+            // directory).
             partials.add(basename, contents);
         }
 
-        Ok(partials)
+        Ok(())
     }
 }
 
@@ -163,7 +175,7 @@ mod tests {
             template_contents: &str,
         ) -> Result<LiquidTemplate> {
             let tempfile_path = self.write_to_file(LIQUID_TEMPLATE_FILENAME, template_contents)?;
-            LiquidTemplate::parse_file(tempfile_path.as_path(), None)
+            LiquidTemplate::parse_file(tempfile_path.as_path(), Vec::new())
         }
 
         /// Creates/overwrites a Liquid template file ("test.liquid") with the given contents.
@@ -176,8 +188,24 @@ mod tests {
             &self,
             template_contents: &str,
         ) -> Result<LiquidTemplate> {
+            self.create_liquid_template_with_multidir_partials(template_contents, Vec::new())
+        }
+
+        /// As above, but with multiple partials directories.
+        fn create_liquid_template_with_multidir_partials(
+            &self,
+            template_contents: &str,
+            additional_dirpaths: Vec<PathBuf>,
+        ) -> Result<LiquidTemplate> {
             let tempfile_path = self.write_to_file(LIQUID_TEMPLATE_FILENAME, template_contents)?;
-            LiquidTemplate::parse_file(tempfile_path.as_path(), Some(self.tmpdir.path()))
+            let dirpaths = {
+                let mut paths = Vec::new();
+                paths.push(self.tmpdir.path().to_path_buf());
+                paths.extend(additional_dirpaths);
+                paths
+            };
+
+            LiquidTemplate::parse_file(tempfile_path.as_path(), dirpaths)
         }
 
         /// Writes the given UTF-8 contents string into a file in this TempDir fixture.
@@ -195,6 +223,13 @@ mod tests {
     fn tmpdir() -> TempDirFixture {
         TempDirFixture {
             tmpdir: TempDir::new("tests").unwrap(),
+        }
+    }
+
+    #[fixture]
+    fn tmpdir_2() -> TempDirFixture {
+        TempDirFixture {
+            tmpdir: TempDir::new("tests_2").unwrap(),
         }
     }
 
@@ -270,9 +305,9 @@ mod tests {
 
     #[rstest]
     fn test_render_with_partials(tmpdir: TempDirFixture, palette: Palette) -> Result<()> {
-        let partial_content = "Palette:\n";
+        let partial_content = "{{ title }}:\n";
         let liquid_template_content = r#"
-          {%- render "common" %}
+          {%- render "common", title: "Palette" %}
             bg_0: #{{ bg_0 }}
             bg_1: #{{ bg_1 }}
         "#;
@@ -286,6 +321,45 @@ mod tests {
 
         let liquid_template =
             tmpdir.create_liquid_template_with_partials(liquid_template_content)?;
+
+        let rendered = liquid_template.render(&palette, true)?;
+        assert_eq!(liquid_template_rendered, rendered);
+
+        Ok(())
+    }
+
+    #[rstest]
+    fn test_render_with_partials_multiple_dirs(
+        tmpdir: TempDirFixture,
+        tmpdir_2: TempDirFixture,
+        palette: Palette,
+    ) -> Result<()> {
+        let partial_content_prepend = "{{ palette.name }}:\n";
+        let liquid_template_content = r#"
+          {%- include "prepend.liquid" %}
+            bg_0: #{{ bg_0 }}
+            bg_1: #{{ bg_1 }}
+            {%- include "append.liquid" -%}
+        "#;
+        let partial_content_append = r#"
+            fg_0: #{{ fg_0 }}
+            fg_1: #{{ fg_1 }}
+        "#;
+        let liquid_template_rendered = r#"Selenized light:
+
+            bg_0: #fef3da
+            bg_1: #f0e4cc
+            fg_0: #52666d
+            fg_1: #384c52
+        "#;
+
+        tmpdir.write_to_file("prepend.liquid", partial_content_prepend)?;
+        tmpdir_2.write_to_file("append.liquid", partial_content_append)?;
+
+        let liquid_template = tmpdir.create_liquid_template_with_multidir_partials(
+            liquid_template_content,
+            vec![tmpdir_2.tmpdir.path().to_path_buf()],
+        )?;
 
         let rendered = liquid_template.render(&palette, true)?;
         assert_eq!(liquid_template_rendered, rendered);

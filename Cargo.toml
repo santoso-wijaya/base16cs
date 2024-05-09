@@ -3,6 +3,6 @@ members = ["base16cs", "base16cs-cli"]
 resolver = "2"
 
 [workspace.package]
-version = "0.1.0"
 authors = ["Santoso Wijaya <code@swijaya.me>"]
+version = "0.1.1"
 edition = "2021"
