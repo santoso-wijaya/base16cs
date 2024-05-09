@@ -1,6 +1,6 @@
 [package]
 name = "base16cs"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 authors = ["Santoso Wijaya <code@swijaya.me>"]
 
@@ -12,13 +12,13 @@ path = "src/lib.rs"
 
 [dependencies]
 anyhow = { version = "1.0" }
-arrayvec = { version = "0.7.4", features = ["serde"] }
-palette = { version = "0.7.6", features = ["serializing"] }
+arrayvec = { version = "0.7", features = ["serde"] }
 glob = "0.3"
-liquid = "0.26.4"
+liquid = { version = "0.26", features = ["stdlib"] }
 num-traits = "0.2"
+palette = { version = "0.7", features = ["serializing"] }
 serde = { version = "1.0" }
-serde_yaml = "0.9.34"
+serde_yaml = "0.9"
 
 [dev-dependencies]
 rstest = "0.19"
