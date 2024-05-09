@@ -166,6 +166,20 @@ mod tests {
             LiquidTemplate::parse_file(tempfile_path.as_path(), None)
         }
 
+        /// Creates/overwrites a Liquid template file ("test.liquid") with the given contents.
+        ///
+        /// Returns a LiquidTemplate object that is parsed from said contents.
+        ///
+        /// Note that the Liquid parser used here is also configured to parse partials from the
+        /// underlying temp directory.
+        fn create_liquid_template_with_partials(
+            &self,
+            template_contents: &str,
+        ) -> Result<LiquidTemplate> {
+            let tempfile_path = self.write_to_file(LIQUID_TEMPLATE_FILENAME, template_contents)?;
+            LiquidTemplate::parse_file(tempfile_path.as_path(), Some(self.tmpdir.path()))
+        }
+
         /// Writes the given UTF-8 contents string into a file in this TempDir fixture.
         ///
         /// Returns a full filepath to the newly created file.
@@ -250,6 +264,31 @@ mod tests {
 
         let result = liquid_template.render(&palette, false);
         result.expect_err("Should not have been able to render template with unrolled color names");
+
+        Ok(())
+    }
+
+    #[rstest]
+    fn test_render_with_partials(tmpdir: TempDirFixture, palette: Palette) -> Result<()> {
+        let partial_content = "Palette:\n";
+        let liquid_template_content = r#"
+          {%- render "common" %}
+            bg_0: #{{ bg_0 }}
+            bg_1: #{{ bg_1 }}
+        "#;
+        let liquid_template_rendered = r#"Palette:
+
+            bg_0: #fef3da
+            bg_1: #f0e4cc
+        "#;
+
+        tmpdir.write_to_file("common.liquid", partial_content)?;
+
+        let liquid_template =
+            tmpdir.create_liquid_template_with_partials(liquid_template_content)?;
+
+        let rendered = liquid_template.render(&palette, true)?;
+        assert_eq!(liquid_template_rendered, rendered);
 
         Ok(())
     }
