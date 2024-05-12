@@ -86,11 +86,10 @@ Palette colors:
 {%- endfor -%}
 ```
 
-Rendering this with the palette above would output:
+Rendering this with the palette above would result in:
 
-```
+```text
 Palette name: My Palette
 Palette colors:
   bg: #fef3da
-  fg: #384c52
 ```

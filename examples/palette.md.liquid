@@ -2,9 +2,9 @@
 Instantiate this Liquid template with a `Palette`, e.g.:
 
 ```
-$ cargo run -p base16cs-cli -- \
-    --palette base16cs/colorschemes/selenized_light.yaml \
-    --template base16cs-cli/examples/palette.md.liquid \
+cargo run --features=cli --bin render -- \
+    --palette examples/colorschemes/selenized_light.yaml \
+    --template examples/palette.md.liquid \
   > selenized-light.md
 ```
 {% endcomment %}
