@@ -89,8 +89,8 @@ pub struct DerivedColor<'a> {
     pub srgb_hex: String,
 }
 
-impl<'a> DerivedColor<'a> {
-    pub fn from_base_color(base: &'a BaseColor) -> Self {
+impl<'a> From<&'a BaseColor> for DerivedColor<'a> {
+    fn from(base: &'a BaseColor) -> Self {
         let srgb: Srgb = base.lab.into_color();
         let srgb_u8: Srgb<u8> = srgb.into_format();
         let srgb_hex = format!("{:x}", srgb_u8);
@@ -117,12 +117,12 @@ pub struct DerivedPalette<'a, const N: usize> {
 pub type Base16DerivedPalette<'a> = DerivedPalette<'a, 16>;
 pub type Base16DerivedColors<'a> = [DerivedColor<'a>; 16];
 
-impl<'a, const N: usize> DerivedPalette<'a, N> {
-    pub fn from_palette(base_palette: &'a Palette<N>) -> Self {
+impl<'a, const N: usize> From<&'a Palette<N>> for DerivedPalette<'a, N> {
+    fn from(base_palette: &'a Palette<N>) -> Self {
         let colors: [DerivedColor<'a>; N] = base_palette
             .colors
             .iter()
-            .map(DerivedColor::from_base_color)
+            .map(DerivedColor::from)
             .collect::<ArrayVec<_, N>>()
             .into_inner()
             .unwrap();

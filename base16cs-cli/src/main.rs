@@ -49,7 +49,7 @@ fn main() -> Result<()> {
 }
 
 fn print_derived_palette(palette: &Base16Palette) -> Result<String> {
-    let derived_palette = Base16DerivedPalette::from_palette(palette);
+    let derived_palette = Base16DerivedPalette::from(palette);
     derived_palette.serialize()
 }
 

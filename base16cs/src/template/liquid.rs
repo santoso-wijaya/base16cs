@@ -96,7 +96,7 @@ impl<const N: usize> PaletteRenderer<N> for LiquidTemplate {
     /// * `unroll_colors_hex` - if `true`, each color in the palette will be unrolled
     ///   as its sRGB hex string and keyed to said color's name.
     fn render(&self, palette: &Palette<N>, unroll_colors_hex: bool) -> Result<String> {
-        let derived_palette = DerivedPalette::from_palette(palette);
+        let derived_palette = DerivedPalette::from(palette);
 
         let palette_obj_value = to_value(&derived_palette).with_context(|| {
             format!(
