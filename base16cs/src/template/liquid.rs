@@ -69,7 +69,7 @@ impl LiquidTemplate {
     /// Parses all `.liquid` files in the given directory, and insert them into the given partials.
     fn parse_partials(dirpath: &Path, partials: &mut Partials) -> Result<()> {
         let pattern = format!("{}/*.liquid", dirpath.to_str().unwrap());
-        let matching_paths = glob(&pattern[..])?;
+        let matching_paths = glob(&pattern)?;
 
         for path in matching_paths.filter_map(core::result::Result::ok) {
             let basename = String::from(path.file_name().unwrap().to_str().unwrap());

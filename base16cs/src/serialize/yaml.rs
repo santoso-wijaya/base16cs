@@ -153,7 +153,7 @@ colors:
     #[rstest]
     fn test_yaml_deserialize(palette: Base16Palette) -> Result<()> {
         let yaml = String::from(PALETTE_YAML);
-        let de_palette = Palette::from_yaml(yaml.as_str())?;
+        let de_palette = Palette::from_yaml(&yaml)?;
         assert_eq!(de_palette, palette);
 
         Ok(())

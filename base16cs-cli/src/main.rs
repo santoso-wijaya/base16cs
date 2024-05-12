@@ -30,8 +30,8 @@ struct Cli {
 fn main() -> Result<()> {
     let args = Cli::parse();
 
-    let palette_yaml = std::fs::read_to_string(args.palette.as_path())?;
-    let palette = Base16Palette::from_yaml(palette_yaml.as_str())?;
+    let palette_yaml = std::fs::read_to_string(&args.palette)?;
+    let palette = Base16Palette::from_yaml(&palette_yaml)?;
 
     let output = match args.template {
         None => print_derived_palette(&palette),
@@ -49,7 +49,7 @@ fn main() -> Result<()> {
 }
 
 fn print_derived_palette(palette: &Base16Palette) -> Result<String> {
-    let derived_palette = Base16DerivedPalette::from(palette);
+    let derived_palette: Base16DerivedPalette = palette.into();
     derived_palette.serialize()
 }
 
@@ -59,6 +59,6 @@ fn render_template(
     palette: &Base16Palette,
     unroll_colors_hex: bool,
 ) -> Result<String> {
-    let template = LiquidTemplate::parse_file(path.as_path(), partials_dirs)?;
+    let template = LiquidTemplate::parse_file(&path, partials_dirs)?;
     template.render(palette, unroll_colors_hex)
 }
