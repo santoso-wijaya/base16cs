@@ -10,6 +10,8 @@
 //!
 //! ## Examples
 //!
+//! ### Defining a base palette and deriving computed color values
+//!
 //! ```rust
 //! use base16cs::{Palette, BaseColor, DerivedPalette};
 //!
@@ -31,10 +33,24 @@
 //!
 //! assert_eq!(derived_colors[0].srgb_hex, "fef3da");
 //! assert_eq!(derived_colors[1].srgb_hex, "384c52");
+//! ```
 //!
-//! // Serialize (to YAML)
+//! ### Serializing and deserializing a palette (YAML)
+//!
+//! This crate is compiled with YAML serde by default.
+//!
+//! ```rust
+//! # use base16cs::{Palette, BaseColor, DerivedPalette};
 //! use base16cs::Serializable;
 //!
+//! # let palette = Palette::new(
+//! #     "My Palette",
+//! #     [
+//! #         BaseColor::new("bg", 96, 0, 13),
+//! #         BaseColor::new("fg", 31, -6, -6),
+//! #     ]);
+//!
+//! # let derived_palette = DerivedPalette::from(&palette);
 //! let serialized = derived_palette.serialize().unwrap();
 //! assert_eq!(serialized, r#"name: My Palette
 //! colors:
@@ -62,6 +78,43 @@
 //!   srgb_hex: 384c52
 //! "#);
 //! ```
+//!
+//! Deserialization is always done from a *base* palette, since its derived form
+//! can be re-computed at runtime.
+//!
+//! ```rust
+//! # use base16cs::{Palette, BaseColor};
+//! # use base16cs::Serializable;
+//!
+//! # let palette = Palette::new(
+//! #     "My Palette",
+//! #     [
+//! #         BaseColor::new("bg", 96, 0, 13),
+//! #         BaseColor::new("fg", 31, -6, -6),
+//! #     ]);
+//!
+//! let yaml_str = r#"
+//! name: My Palette
+//! colors:
+//! - name: bg
+//!   lab:
+//!     l: 96.0
+//!     a: 0.0
+//!     b: 13.0
+//! - name: fg
+//!   lab:
+//!     l: 31.0
+//!     a: -6.0
+//!     b: -6.0
+//! "#;
+//!
+//! let de_palette = Palette::<2>::from_yaml(yaml_str).unwrap();
+//! assert_eq!(de_palette, palette);
+//! ```
+//!
+//! ### Injecting a palette into a template for render
+//!
+//! See: [`template`](template/mod.rs) module.
 
 mod palette;
 mod serialize;

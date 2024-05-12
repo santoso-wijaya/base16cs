@@ -5,6 +5,7 @@ use crate::serialize::Serializable;
 use anyhow::{Context, Result};
 
 impl<const N: usize> Palette<N> {
+    /// Deserializes a base palette from a YAML string.
     pub fn from_yaml(yaml: &str) -> Result<Palette<N>> {
         serde_yaml::from_str(yaml)
             .with_context(|| format!("Could not deserialize YAML to palette:\n{}", yaml))
