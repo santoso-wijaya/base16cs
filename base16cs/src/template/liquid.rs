@@ -83,8 +83,8 @@ impl LiquidTemplate {
     }
 }
 
-impl PaletteRenderer for LiquidTemplate {
-    fn render(&self, palette: &Palette, unroll_colors_hex: bool) -> Result<String> {
+impl<const N: usize> PaletteRenderer<N> for LiquidTemplate {
+    fn render(&self, palette: &Palette<N>, unroll_colors_hex: bool) -> Result<String> {
         let derived_palette = DerivedPalette::from_palette(palette);
 
         let palette_obj_value = to_value(&derived_palette).with_context(|| {
@@ -126,14 +126,14 @@ impl PaletteRenderer for LiquidTemplate {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::palette::BaseColor;
+    use crate::palette::{Base16Palette, BaseColor};
 
     use rstest::*;
     use std::fs::write;
     use tempdir::TempDir;
 
     #[fixture]
-    fn palette() -> Palette {
+    fn palette() -> Base16Palette {
         Palette::new(
             "Selenized light",
             [
@@ -234,7 +234,7 @@ mod tests {
     }
 
     #[rstest]
-    fn test_render_palette(tmpdir: TempDirFixture, palette: Palette) -> Result<()> {
+    fn test_render_palette(tmpdir: TempDirFixture, palette: Base16Palette) -> Result<()> {
         let liquid_template_content = r#"
             {%- for color in palette.colors limit: 3 %}
 
@@ -269,7 +269,7 @@ mod tests {
     }
 
     #[rstest]
-    fn test_render_unroll_colors_hex(tmpdir: TempDirFixture, palette: Palette) -> Result<()> {
+    fn test_render_unroll_colors_hex(tmpdir: TempDirFixture, palette: Base16Palette) -> Result<()> {
         let liquid_template_content = r#"
             bg_0: #{{ bg_0 }}
             bg_1: #{{ bg_1 }}
@@ -289,7 +289,10 @@ mod tests {
     }
 
     #[rstest]
-    fn test_render_no_unroll_colors_hex(tmpdir: TempDirFixture, palette: Palette) -> Result<()> {
+    fn test_render_no_unroll_colors_hex(
+        tmpdir: TempDirFixture,
+        palette: Base16Palette,
+    ) -> Result<()> {
         let liquid_template_content = r#"
             bg_0: #{{ bg_0 }}
             bg_1: #{{ bg_1 }}
@@ -304,7 +307,7 @@ mod tests {
     }
 
     #[rstest]
-    fn test_render_with_partials(tmpdir: TempDirFixture, palette: Palette) -> Result<()> {
+    fn test_render_with_partials(tmpdir: TempDirFixture, palette: Base16Palette) -> Result<()> {
         let partial_content = "{{ title }}:\n";
         let liquid_template_content = r#"
           {%- render "common", title: "Palette" %}
@@ -332,7 +335,7 @@ mod tests {
     fn test_render_with_partials_multiple_dirs(
         tmpdir: TempDirFixture,
         tmpdir_2: TempDirFixture,
-        palette: Palette,
+        palette: Base16Palette,
     ) -> Result<()> {
         let partial_content_prepend = "{{ palette.name }}:\n";
         let liquid_template_content = r#"

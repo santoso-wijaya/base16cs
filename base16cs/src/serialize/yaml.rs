@@ -4,21 +4,21 @@ use crate::serialize::Serializable;
 
 use anyhow::{Context, Result};
 
-impl Palette {
-    pub fn from_yaml(yaml: &str) -> Result<Palette> {
+impl<const N: usize> Palette<N> {
+    pub fn from_yaml(yaml: &str) -> Result<Palette<N>> {
         serde_yaml::from_str(yaml)
             .with_context(|| format!("Could not deserialize YAML to palette:\n{}", yaml))
     }
 }
 
-impl Serializable for Palette {
+impl<const N: usize> Serializable for Palette<N> {
     fn serialize(&self) -> Result<String> {
         serde_yaml::to_string(self)
             .with_context(|| format!("Could not serialize palette to YAML:\n{:?}", self))
     }
 }
 
-impl<'a> Serializable for DerivedPalette<'a> {
+impl<'a, const N: usize> Serializable for DerivedPalette<'a, N> {
     fn serialize(&self) -> Result<String> {
         serde_yaml::to_string(self)
             .with_context(|| format!("Could not serialize derived palette to YAML:\n{:?}", self))
@@ -28,12 +28,12 @@ impl<'a> Serializable for DerivedPalette<'a> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::palette::BaseColor;
+    use crate::palette::{Base16Palette, BaseColor};
 
     use rstest::*;
 
     #[fixture]
-    fn palette() -> Palette {
+    fn palette() -> Base16Palette {
         Palette::new(
             "Selenized light",
             [
@@ -143,7 +143,7 @@ colors:
 "#;
 
     #[rstest]
-    fn test_yaml_serialize(palette: Palette) -> Result<()> {
+    fn test_yaml_serialize(palette: Base16Palette) -> Result<()> {
         let yaml = palette.serialize()?;
         assert_eq!(yaml, PALETTE_YAML);
 
@@ -151,7 +151,7 @@ colors:
     }
 
     #[rstest]
-    fn test_yaml_deserialize(palette: Palette) -> Result<()> {
+    fn test_yaml_deserialize(palette: Base16Palette) -> Result<()> {
         let yaml = String::from(PALETTE_YAML);
         let de_palette = Palette::from_yaml(yaml.as_str())?;
         assert_eq!(de_palette, palette);

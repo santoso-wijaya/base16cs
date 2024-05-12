@@ -23,6 +23,7 @@ liquid = { version = "0.26", features = ["stdlib"], optional = true }
 num-traits = "0.2"
 palette = { version = "0.7", features = ["serializing"] }
 serde = { version = "1.0" }
+serde_arrays = "0.1"
 serde_yaml = { version = "0.9", optional = true }
 
 [dev-dependencies]

@@ -28,36 +28,41 @@ impl BaseColor {
     }
 }
 
-type Base16Colors = [BaseColor; 16];
-
+/// TODO: Document me.
 #[derive(Serialize, Deserialize, PartialEq, Debug)]
-pub struct Palette {
+pub struct Palette<const N: usize> {
     pub name: String,
-    /// See: https://github.com/chriskempson/base16/blob/main/styling.md
-    /// In Base16 framework, [base00..base07] are monotone shades:
-    /// base00 - default background
-    /// base01 - lighter bg
-    /// base02 - selection bg
-    /// base03 - comments, invis
-    /// base04 - dark foreground
-    /// base05 - default foreground
-    /// base06 - light fg - often unused
-    /// base07 - light bg - often unused
-    /// [base08..base0f] are accent colors, with the following usage guidelines:
-    /// base08 - vars, diff deleted
-    /// base09 - ints, bools, consts
-    /// base0a - classes, search bg
-    /// base0b - strings, diff inserted
-    /// base0c - regex, escape chars
-    /// base0d - funcs, headings
-    /// base0e - keywords, diff changed
-    /// base0f - deprecated, embeds
-    pub colors: Base16Colors,
+    #[serde(with = "serde_arrays")]
+    pub colors: [BaseColor; N],
 }
 
-impl Palette {
+/// A palette with 16 base colors.
+///
+/// See: https://github.com/chriskempson/base16/blob/main/styling.md
+/// In Base16 framework, [base00..base07] are monotone shades:
+/// base00 - default background
+/// base01 - lighter bg
+/// base02 - selection bg
+/// base03 - comments, invis
+/// base04 - dark foreground
+/// base05 - default foreground
+/// base06 - light fg - often unused
+/// base07 - light bg - often unused
+/// [base08..base0f] are accent colors, with the following usage guidelines:
+/// base08 - vars, diff deleted
+/// base09 - ints, bools, consts
+/// base0a - classes, search bg
+/// base0b - strings, diff inserted
+/// base0c - regex, escape chars
+/// base0d - funcs, headings
+/// base0e - keywords, diff changed
+/// base0f - deprecated, embeds
+pub type Base16Palette = Palette<16>;
+pub type Base16Colors = [BaseColor; 16];
+
+impl<const N: usize> Palette<N> {
     #[inline]
-    pub fn new<S>(name: S, colors: Base16Colors) -> Palette
+    pub fn new<S>(name: S, colors: [BaseColor; N]) -> Palette<N>
     where
         S: Into<String>,
     {
@@ -95,21 +100,24 @@ impl<'a> DerivedColor<'a> {
     }
 }
 
-type Base16DerivedColors<'a> = [DerivedColor<'a>; 16];
-
+/// TODO: Document me.
 #[derive(Serialize, Debug)]
-pub struct DerivedPalette<'a> {
+pub struct DerivedPalette<'a, const N: usize> {
     pub name: &'a String,
-    pub colors: Base16DerivedColors<'a>,
+    #[serde(with = "serde_arrays")]
+    pub colors: [DerivedColor<'a>; N],
 }
 
-impl<'a> DerivedPalette<'a> {
-    pub fn from_palette(base_palette: &'a Palette) -> Self {
-        let colors: Base16DerivedColors = base_palette
+pub type Base16DerivedPalette<'a> = DerivedPalette<'a, 16>;
+pub type Base16DerivedColors<'a> = [DerivedColor<'a>; 16];
+
+impl<'a, const N: usize> DerivedPalette<'a, N> {
+    pub fn from_palette(base_palette: &'a Palette<N>) -> Self {
+        let colors: [DerivedColor<'a>; N] = base_palette
             .colors
             .iter()
             .map(DerivedColor::from_base_color)
-            .collect::<ArrayVec<_, 16>>()
+            .collect::<ArrayVec<_, N>>()
             .into_inner()
             .unwrap();
 

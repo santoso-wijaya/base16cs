@@ -3,8 +3,8 @@ use clap::Parser;
 use std::path::PathBuf;
 
 use base16cs::liquid::LiquidTemplate;
-use base16cs::DerivedPalette;
-use base16cs::Palette;
+use base16cs::Base16DerivedPalette;
+use base16cs::Base16Palette;
 use base16cs::PaletteRenderer;
 use base16cs::Serializable;
 
@@ -31,7 +31,7 @@ fn main() -> Result<()> {
     let args = Cli::parse();
 
     let palette_yaml = std::fs::read_to_string(args.palette.as_path())?;
-    let palette = Palette::from_yaml(palette_yaml.as_str())?;
+    let palette = Base16Palette::from_yaml(palette_yaml.as_str())?;
 
     let output = match args.template {
         None => print_derived_palette(&palette),
@@ -48,15 +48,15 @@ fn main() -> Result<()> {
     Ok(())
 }
 
-fn print_derived_palette(palette: &Palette) -> Result<String> {
-    let derived_palette = DerivedPalette::from_palette(palette);
+fn print_derived_palette(palette: &Base16Palette) -> Result<String> {
+    let derived_palette = Base16DerivedPalette::from_palette(palette);
     derived_palette.serialize()
 }
 
 fn render_template(
     path: PathBuf,
     partials_dirs: Vec<PathBuf>,
-    palette: &Palette,
+    palette: &Base16Palette,
     unroll_colors_hex: bool,
 ) -> Result<String> {
     let template = LiquidTemplate::parse_file(path.as_path(), partials_dirs)?;

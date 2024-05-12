@@ -2,6 +2,10 @@ mod palette;
 mod serialize;
 mod template;
 
+pub use palette::Base16Colors;
+pub use palette::Base16DerivedColors;
+pub use palette::Base16DerivedPalette;
+pub use palette::Base16Palette;
 pub use palette::BaseColor;
 pub use palette::DerivedColor;
 pub use palette::DerivedPalette;
