@@ -9,8 +9,11 @@ use std::path::{Path, PathBuf};
 use crate::palette::{DerivedPalette, Palette};
 use crate::template::PaletteRenderer;
 
+/// Represents a parsed Liquid template.
 pub struct LiquidTemplate {
+    /// Path to the Liquid template file.
     path: PathBuf,
+
     /// A parsed Liquid template object.
     template: Template,
 }
@@ -18,7 +21,7 @@ pub struct LiquidTemplate {
 type Partials = EagerCompiler<InMemorySource>;
 
 impl LiquidTemplate {
-    /// Instantiate a LiquidTemplate by parsing the given file.
+    /// Instantiates a LiquidTemplate by parsing the given file.
     ///
     /// The resulting template object will be ready for rendering given context.
     ///
@@ -38,7 +41,7 @@ impl LiquidTemplate {
         })
     }
 
-    /// Build a Liquid Parser and, optionally, preload it with template partials.
+    /// Builds a Liquid Parser and, optionally, preload it with template partials.
     fn build_parser(partials_dirs: Vec<PathBuf>) -> Result<Parser> {
         let partials = {
             let mut _partials = Partials::empty();
@@ -84,6 +87,14 @@ impl LiquidTemplate {
 }
 
 impl<const N: usize> PaletteRenderer<N> for LiquidTemplate {
+    /// Renders this Liquid template with an injection of the given palette.
+    ///
+    /// The given `palette` will be converted into a `liquid::Object` value
+    /// and injected as a variable in the rendered template with the key `"palette"`.
+    ///
+    /// * `palette` - a Palete to be injected when rendering this Liquid template.
+    /// * `unroll_colors_hex` - if `true`, each color in the palette will be unrolled
+    ///   as its sRGB hex string and keyed to said color's name.
     fn render(&self, palette: &Palette<N>, unroll_colors_hex: bool) -> Result<String> {
         let derived_palette = DerivedPalette::from_palette(palette);
 

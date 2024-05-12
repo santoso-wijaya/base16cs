@@ -28,10 +28,13 @@ impl BaseColor {
     }
 }
 
-/// TODO: Document me.
+/// A palette is a collection of base colors (in their canonical forms only).
 #[derive(Serialize, Deserialize, PartialEq, Debug)]
 pub struct Palette<const N: usize> {
+    /// This palette's name.
     pub name: String,
+
+    /// The base colors in this palette.
     #[serde(with = "serde_arrays")]
     pub colors: [BaseColor; N],
 }
@@ -100,10 +103,13 @@ impl<'a> DerivedColor<'a> {
     }
 }
 
-/// TODO: Document me.
+/// Like Palette, a DerivedPalette contains an array of DerivedColors.
 #[derive(Serialize, Debug)]
 pub struct DerivedPalette<'a, const N: usize> {
-    pub name: &'a String,
+    /// A reference to the base palette's name.
+    pub name: &'a str,
+
+    /// The derived colors in this palette.
     #[serde(with = "serde_arrays")]
     pub colors: [DerivedColor<'a>; N],
 }
