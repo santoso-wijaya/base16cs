@@ -2,11 +2,11 @@ use anyhow::Result;
 use clap::Parser;
 use std::path::PathBuf;
 
-use base16cs::palette::DerivedPalette;
-use base16cs::palette::Palette;
-use base16cs::serialize::Serializable;
-use base16cs::template::liquid::LiquidTemplate;
-use base16cs::template::PaletteRenderer;
+use base16cs::liquid::LiquidTemplate;
+use base16cs::DerivedPalette;
+use base16cs::Palette;
+use base16cs::PaletteRenderer;
+use base16cs::Serializable;
 
 /// Load a Liquid template file and render it with the values of a colorscheme
 /// palette.

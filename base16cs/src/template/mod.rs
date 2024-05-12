@@ -1,5 +1,3 @@
-pub mod liquid;
-
 use crate::palette::Palette;
 
 use anyhow::Result;
@@ -16,3 +14,6 @@ pub trait PaletteRenderer {
     ///   hex strings with their own names as keys.
     fn render(&self, palette: &Palette, unroll_colors_hex: bool) -> Result<String>;
 }
+
+#[cfg(feature = "liquid")]
+pub mod liquid;
