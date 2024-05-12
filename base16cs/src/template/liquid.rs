@@ -7,7 +7,7 @@ use std::fs::read_to_string;
 use std::path::{Path, PathBuf};
 
 use crate::palette::{DerivedPalette, Palette};
-use crate::template::PaletteRenderer;
+use crate::template::{PaletteRenderer, RenderOptions};
 
 /// Represents a parsed Liquid template.
 pub struct LiquidTemplate {
@@ -91,11 +91,7 @@ impl<const N: usize> PaletteRenderer<N> for LiquidTemplate {
     ///
     /// The given `palette` will be converted into a `liquid::Object` value
     /// and injected as a variable in the rendered template with the key `"palette"`.
-    ///
-    /// * `palette` - a Palete to be injected when rendering this Liquid template.
-    /// * `unroll_colors_hex` - if `true`, each color in the palette will be unrolled
-    ///   as its sRGB hex string and keyed to said color's name.
-    fn render(&self, palette: &Palette<N>, unroll_colors_hex: bool) -> Result<String> {
+    fn render(&self, palette: &Palette<N>, options: RenderOptions) -> Result<String> {
         let derived_palette = DerivedPalette::from(palette);
 
         let palette_obj_value = to_value(&derived_palette).with_context(|| {
@@ -108,7 +104,7 @@ impl<const N: usize> PaletteRenderer<N> for LiquidTemplate {
         obj.insert("palette".into(), palette_obj_value);
 
         // Insert each color's sRGB hex string as values keyed to the color's names.
-        if unroll_colors_hex {
+        if options.unroll_colors_hex {
             for derived_color in derived_palette.colors.iter() {
                 let srgb_hex_value = to_value(&derived_color.srgb_hex).with_context(|| {
                     format!(
@@ -272,7 +268,7 @@ mod tests {
 
         let liquid_template = tmpdir.create_liquid_template_no_partials(liquid_template_content)?;
 
-        let rendered = liquid_template.render(&palette, true)?;
+        let rendered = liquid_template.render(&palette, RenderOptions { unroll_colors_hex: true })?;
 
         assert_eq!(liquid_template_rendered, rendered);
 
@@ -292,7 +288,7 @@ mod tests {
 
         let liquid_template = tmpdir.create_liquid_template_no_partials(liquid_template_content)?;
 
-        let rendered = liquid_template.render(&palette, true)?;
+        let rendered = liquid_template.render(&palette, RenderOptions { unroll_colors_hex: true })?;
 
         assert_eq!(liquid_template_rendered, rendered);
 
@@ -311,7 +307,7 @@ mod tests {
 
         let liquid_template = tmpdir.create_liquid_template_no_partials(liquid_template_content)?;
 
-        let result = liquid_template.render(&palette, false);
+        let result = liquid_template.render(&palette, RenderOptions { unroll_colors_hex: false });
         result.expect_err("Should not have been able to render template with unrolled color names");
 
         Ok(())
@@ -336,7 +332,7 @@ mod tests {
         let liquid_template =
             tmpdir.create_liquid_template_with_partials(liquid_template_content)?;
 
-        let rendered = liquid_template.render(&palette, true)?;
+        let rendered = liquid_template.render(&palette, RenderOptions { unroll_colors_hex: true })?;
         assert_eq!(liquid_template_rendered, rendered);
 
         Ok(())
@@ -375,7 +371,7 @@ mod tests {
             vec![tmpdir_2.tmpdir.path().to_path_buf()],
         )?;
 
-        let rendered = liquid_template.render(&palette, true)?;
+        let rendered = liquid_template.render(&palette, RenderOptions { unroll_colors_hex: true })?;
         assert_eq!(liquid_template_rendered, rendered);
 
         Ok(())

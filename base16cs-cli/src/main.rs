@@ -1,4 +1,5 @@
 use anyhow::Result;
+use base16cs::RenderOptions;
 use clap::Parser;
 use std::path::PathBuf;
 
@@ -39,7 +40,9 @@ fn main() -> Result<()> {
             template_path,
             args.partials_dirs,
             &palette,
-            args.unroll_colors_hex,
+            RenderOptions {
+                unroll_colors_hex: args.unroll_colors_hex,
+            },
         ),
     }?;
 
@@ -57,8 +60,8 @@ fn render_template(
     path: PathBuf,
     partials_dirs: Vec<PathBuf>,
     palette: &Base16Palette,
-    unroll_colors_hex: bool,
+    render_options: RenderOptions,
 ) -> Result<String> {
     let template = LiquidTemplate::parse_file(&path, partials_dirs)?;
-    template.render(palette, unroll_colors_hex)
+    template.render(palette, render_options)
 }

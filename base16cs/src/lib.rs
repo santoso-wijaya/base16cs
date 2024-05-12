@@ -81,3 +81,4 @@ pub use serialize::Serializable;
 
 pub use template::liquid;
 pub use template::PaletteRenderer;
+pub use template::RenderOptions;
