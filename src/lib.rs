@@ -49,7 +49,6 @@
 //! #         BaseColor::new("bg", 96, 0, 13),
 //! #         BaseColor::new("fg", 31, -6, -6),
 //! #     ]);
-//!
 //! # let derived_palette = DerivedPalette::from(&palette);
 //! let serialized = derived_palette.serialize().unwrap();
 //! assert_eq!(serialized, r#"name: My Palette
@@ -85,14 +84,12 @@
 //! ```rust
 //! # use base16cs::{Palette, BaseColor};
 //! # use base16cs::Serializable;
-//!
 //! # let palette = Palette::new(
 //! #     "My Palette",
 //! #     [
 //! #         BaseColor::new("bg", 96, 0, 13),
 //! #         BaseColor::new("fg", 31, -6, -6),
 //! #     ]);
-//!
 //! let yaml_str = r#"
 //! name: My Palette
 //! colors:

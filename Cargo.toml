@@ -1,6 +1,6 @@
 [package]
 name = "base16cs"
-version = "0.2.1"
+version = "0.2.2"
 edition = "2021"
 authors = ["Santoso Wijaya <code@swijaya.me>"]
 
@@ -18,7 +18,7 @@ license = "MIT"
 name = "base16cs"
 path = "src/lib.rs"
 
-[[bin]] 
+[[bin]]
 name = "render"
 path = "src/bin/render.rs"
 required-features = ["cli"]
